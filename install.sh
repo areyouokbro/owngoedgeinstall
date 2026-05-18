@@ -10,7 +10,7 @@ echo "=========================================================="
 echo "🚀 GoEdge 边缘节点一键部署工具 (路径修复版)"
 echo "=========================================================="
 
-# 2. 核心参数提取逻辑 (已验证稳定)
+# 2. 核心参数提取逻辑
 RAW_INPUT="$*"
 CLEAN_INPUT=$(echo "$RAW_INPUT" | tr -s '[:space:]' ' ' | sed 's/"//g')
 
@@ -70,17 +70,12 @@ fi
 echo "📂 正在解压并整理文件..."
 unzip -o -q edge-node.zip
 
-# 【核心修复】：找到那个带版本号的长目录名，并重命名为标准的 edge-node
+# 【关键点】：找到解压出来的那个带版本号的文件夹（如 edge-node-linux-amd64-v1.4.1）
+# 将其重命名为标准的 edge-node 文件夹
 EXTRACTED_DIR=$(ls -d edge-node-linux-* 2>/dev/null | head -n 1)
 if [ -n "$EXTRACTED_DIR" ]; then
     mv "$EXTRACTED_DIR" "edge-node"
-    echo "✅ 目录重命名完成: $EXTRACTED_DIR -> edge-node"
-else
-    # 如果解压出来直接就是 edge-node（某些特定版本），则无需处理
-    if [ ! -d "edge-node" ]; then
-        echo "❌ 错误：解压后未找到预期的目录结构。"
-        exit 1
-    fi
+    echo "✅ 目录已重命名: $EXTRACTED_DIR -> edge-node"
 fi
 
 rm -f edge-node.zip
@@ -104,5 +99,5 @@ cd "$INSTALL_DIR" || exit
 echo "=========================================================="
 echo "🎉 安装完成！"
 echo "📂 目录: $INSTALL_DIR"
-echo "✅ 请前往 GoEdge 管理后台确认节点在线状态。"
+echo "✅ 请前往 GoEdge 后台刷新查看节点状态。"
 echo "=========================================================="
