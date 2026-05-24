@@ -7,7 +7,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 echo "=========================================================="
-echo "🚀 GoEdge 边缘节点一键部署工具 (GitHub Release v1.0 最终版)"
+echo "🚀 GoEdge 边缘节点一键部署工具 (智能全兼容版)"
 echo "=========================================================="
 
 # 2. 核心参数提取 (增强容错)
@@ -68,35 +68,30 @@ if [ ! -s "edge-node.zip" ]; then
     exit 1
 fi
 
-# ================= 核心修复部分 =================
 echo "📂 正在解压并智能识别目录结构..."
 unzip -o -q edge-node.zip
 
-# 方案 A: 压缩包里本身就叫 edge-node 目录
+# ======= 智能兼容逻辑：完美识别你的 edge-node 目录 =======
 if [ -d "edge-node" ]; then
-    echo "✅ 结构匹配: 识别到标准的 edge-node 目录"
+    echo "✅ 结构匹配: 完美识别到标准的 edge-node 目录"
 
-# 方案 B: 压缩包里带了版本号后缀的目录 (如 edge-node-linux-amd64)
 elif EXTRACTED_DIR=$(ls -d edge-node-linux-* 2>/dev/null | head -n 1) && [ -n "$EXTRACTED_DIR" ]; then
     echo "✅ 结构匹配: 识别到 $EXTRACTED_DIR，正在重命名..."
     mv "$EXTRACTED_DIR" "edge-node"
 
-# 方案 C: 散装压缩 (用户压缩时选中了内部的所有文件而不是选中文件夹)
 elif [ -f "bin/edge-node" ]; then
     echo "⚠️ 检测到散装解压结构，正在自动重组目录..."
     mkdir -p edge-node
-    # 将解压出来的核心目录移入
     mv bin configs edge-node/ 2>/dev/null
 else
     echo "❌ 错误：解压后未找到合法的 edge-node 结构！"
-    echo "🔍 当前目录解压出了以下文件："
     ls -la
     rm -f edge-node.zip
     exit 1
 fi
 
 rm -f edge-node.zip
-# ================================================
+# =======================================================
 
 # 6. 生成配置
 mkdir -p "$INSTALL_DIR/configs"
